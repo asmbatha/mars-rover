@@ -1,0 +1,34 @@
+{
+    "name": "mars-rover",
+    "version": "1.0.0",
+    "description": "Mars rover practical exercise written in Javascript",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/asmbatha/mars-rover.git"
+    },
+    "keywords": [
+        "nodejs",
+        "expressjs"
+    ],
+    "author": "Ayanda Mbatha",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/asmbatha/mars-rover/issues"
+    },
+    "homepage": "https://github.com/asmbatha/mars-rover#readme",
+    "devDependencies": {
+        "@babel/preset-env": "^7.18.9",
+        "babel-jest": "^28.1.3",
+        "jest": "^28.1.3"
+    },
+    "type": "module",
+    "jest": {
+        "transform": {
+            "^.+\\.jsx?$": "babel-jest"
+        }
+    }
+}

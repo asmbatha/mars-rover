@@ -39,9 +39,7 @@ This is how the rover will interpret each line
   - How you have ensured your code’s correctness.
 * Also include The input to your program (as described above) as well as any additional inputs.
 
-# Software Design
-
-## Components
+## System Components
 
 * Rover navigation engine
     - Javascript Class that perfoms the navigation computation
@@ -66,10 +64,18 @@ This is how the rover will interpret each line
 - [ ] Navigation visualization
 - [ ] Review and update README
 
-# Installation
+## Usage
 
-# Usage
+### Installation
+```
+npm i
+```
 
-## Run from command line
-## Run from browser
-## Testing
+### Run from command line
+
+### Run from browser
+
+### Testing
+```
+npm test
+```
