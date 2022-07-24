@@ -1,14 +1,14 @@
 class Rover {
-    constructor({ zone, start }) {
+    constructor({ zone, start, commands }) {
         this.zone = parseZone(zone)
         this.start = parseStartingPosition.call(this, start)
+        this.commands = parseCommands(commands)
     }
 }
 
 function parseZone(str) {
     const [x, y] = str.split(' ')
 
-    // check zone format
     if (
         isNaN(parseInt(x)) ||
         isNaN(parseInt(y)) ||
@@ -25,7 +25,6 @@ function parseZone(str) {
 function parseStartingPosition(str) {
     const [x, y, direction] = str.split(' ')
 
-    // check zone format
     if (
         isNaN(parseInt(x)) ||
         isNaN(parseInt(y)) ||
@@ -44,6 +43,12 @@ function parseStartingPosition(str) {
         y: Number(y),
         direction
     }
+}
+
+function parseCommands(str) {
+    if (str.match(/[^MLR]/gm)) throw new Error('The only valid commands are M, L, and R')
+
+    return str
 }
 
 export default config => new Rover(config)

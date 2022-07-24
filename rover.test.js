@@ -103,7 +103,7 @@ describe('Starting position', () => {
 // commands
 // Contains only valid commands
 describe('Navigation Commands', () => {
-    test('Should return error for invalid commangs', () => {
+    test('Should return error for invalid commands', () => {
         let actual = () => rover({
             ...config,
             commands: 'ADVDSCV'
