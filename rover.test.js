@@ -23,19 +23,19 @@ describe('Zone initialization', () => {
     })
 
     test('Should return error for incorrectly formatted zone', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             zone: '11'
         })
-        expect(actual).toThrowError('Zone should be in the format `X Y`')
+        expect(actual).toThrowError('Zone should be in the format `X Y`, and should both be numbers > 0')
     })
 
     test('Should return error for invalid zone', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             zone: 'X 10'
         })
-        expect(actual).toThrowError('Zone dimensions should both be numbers > 0')
+        expect(actual).toThrowError('Zone should be in the format `X Y`, and should both be numbers > 0')
     })
 
     test('Should correctly initialize the zone', () => {
@@ -59,7 +59,7 @@ describe('Zone initialization', () => {
 // direction is valid
 describe('Starting position', () => {
     test('Should return error for incorrectly formatted starting position', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             start: '11D'
         })
@@ -67,7 +67,7 @@ describe('Starting position', () => {
     })
 
     test('Should return error for invalid starting postion or direction', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             zone: '1 10 D'
         })
@@ -75,7 +75,7 @@ describe('Starting position', () => {
     })
 
     test('Should return error for if the starting position is out of bounds', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             zone: '1 10 W'
         })
@@ -103,7 +103,7 @@ describe('Starting position', () => {
 // Contains only valid commands
 describe('Navigation Commands', () => {
     test('Should return error for invalid commangs', () => {
-        let actual = rover({
+        let actual = () => rover({
             ...config,
             commands: 'ADVDSCV'
         })
@@ -126,7 +126,7 @@ describe('Navigation Commands', () => {
 // test navigation computation
 describe('Navigation computation', () => {
     test('Should detect a command path that goes out-of-bounds', () => {
-        let actual = rover({
+        let actual = () => rover({
             zone: '3 3',
             start: '2 2 S',
             commands: 'MMMMMS'
