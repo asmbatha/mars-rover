@@ -41,13 +41,13 @@ describe('Zone initialization', () => {
     test('Should correctly initialize the zone', () => {
         let actual = rover({
             ...config,
-            zone: '1 10'
+            zone: '100 100'
         })
 
-        expect(actual).toEqual({
+        expect(actual).toMatchObject({
             zone: {
-                x: 1,
-                y: 10
+                x: 100,
+                y: 100
             }
         })
     })
@@ -69,15 +69,16 @@ describe('Starting position', () => {
     test('Should return error for invalid starting postion or direction', () => {
         let actual = () => rover({
             ...config,
-            zone: '1 10 D'
+            start: '1 10 D'
         })
+
         expect(actual).toThrowError('Starting position should be in the format `[number] [number] [N|E|W|S]`')
     })
 
     test('Should return error for if the starting position is out of bounds', () => {
         let actual = () => rover({
             ...config,
-            zone: '1 10 W'
+            start: '1 10 W'
         })
         expect(actual).toThrowError('Starting position is out of bounds')
     })
@@ -85,10 +86,10 @@ describe('Starting position', () => {
     test('Should correctly set the starting postion', () => {
         let actual = rover({
             ...config,
-            zone: '3 3 S'
+            start: '3 3 S'
         })
 
-        expect(actual).toEqual({
+        expect(actual).toMatchObject({
             start: {
                 x: 3,
                 y: 3,
@@ -116,7 +117,7 @@ describe('Navigation Commands', () => {
             commands: 'MML'
         })
 
-        expect(actual).toEqual({
+        expect(actual).toMatchObject({
             commands: 'MML'
         })
     })
