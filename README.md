@@ -56,9 +56,9 @@ This is how the rover will interpret each line
 
 ## Roadmap
 
-- [ ] Testing environment
-- [ ] Write tests
-- [ ] Rover navigation engine
+- [x] Testing environment
+- [x] Write tests
+- [x] Rover navigation engine
 - [ ] Node executable script
 - [ ] Interface with file upload
 - [ ] Navigation visualization
@@ -72,6 +72,9 @@ npm i
 ```
 
 ### Run from command line
+```
+node .
+```
 
 ### Run from browser
 
