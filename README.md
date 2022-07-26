@@ -59,7 +59,7 @@ This is how the rover will interpret each line
 - [x] Testing environment
 - [x] Write tests
 - [x] Rover navigation engine
-- [ ] Node executable script
+- [X] Node executable script
 - [ ] Interface with file upload
 - [ ] Navigation visualization
 - [ ] Review and update README
