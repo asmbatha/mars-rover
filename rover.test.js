@@ -1,55 +1,34 @@
 import Rover from './Rover.js'
 
-let config = {}
-
-beforeEach(() => {
-    config = {
-        zone: '8 8',
-        start: '1 2 E',
-        commands: 'MMLMRMMRRMML'
-    }
-})
-
 // init Zone
 // Correct format `x y`
 // x and y > 1
 describe('Zone initialization', () => {
+    let rover
     beforeEach(() => {
-        config = {
+        rover = new Rover({
             zone: '8 8',
             start: '1 2 E',
             commands: ''
-        }
+        })
     })
 
     test('Should return error for incorrectly formatted zone', () => {
-        let actual = () => Rover({
-            ...config,
-            zone: '11'
-        })
+        let actual = () => rover.zone = '11'
+
         expect(actual).toThrowError('Zone should be in the format `X Y`, and should both be numbers > 0')
     })
 
     test('Should return error for invalid zone', () => {
-        let actual = () => Rover({
-            ...config,
-            zone: 'X 10'
-        })
+        let actual = () => rover.zone = 'X 10'
+
         expect(actual).toThrowError('Zone should be in the format `X Y`, and should both be numbers > 0')
     })
 
     test('Should correctly initialize the zone', () => {
-        let actual = Rover({
-            ...config,
-            zone: '100 100'
-        })
+        rover.zone = '100 100'
 
-        expect(actual).toMatchObject({
-            zone: {
-                x: 100,
-                y: 100
-            }
-        })
+        expect(rover.zone).toBe('100 100')
     })
 })
 
@@ -58,243 +37,204 @@ describe('Zone initialization', () => {
 // x and y within the boundry
 // direction is valid
 describe('Starting position', () => {
-    test('Should return error for incorrectly formatted starting position', () => {
-        let actual = () => Rover({
-            ...config,
-            start: '11D'
+    let rover
+    beforeEach(() => {
+        rover = new Rover({
+            zone: '8 8',
+            start: '1 2 E',
+            commands: ''
         })
+    })
+
+    test('Should return error for incorrectly formatted starting position', () => {
+        let actual = () => rover.position = '11D'
+
         expect(actual).toThrowError('Starting position should be in the format `[number] [number] [N|E|W|S]`')
     })
 
     test('Should return error for invalid starting postion or direction', () => {
-        let actual = () => Rover({
-            ...config,
-            start: '1 10 D'
-        })
+        let actual = () => rover.position = '1 10 D'
 
         expect(actual).toThrowError('Starting position should be in the format `[number] [number] [N|E|W|S]`')
     })
 
     test('Should return error for if the starting position is out of bounds', () => {
-        let actual = () => Rover({
-            ...config,
-            start: '1 10 W'
-        })
+        let actual = () => rover.position = '1 10 W'
+
         expect(actual).toThrowError('Starting position is out of bounds')
     })
 
     test('Should correctly set the starting postion', () => {
-        let actual = Rover({
-            ...config,
-            start: '1 2 E',
-            commands: ''
-        })
+        rover.position = '1 2 E'
 
-        expect(actual).toMatchObject({
-            position: {
-                x: 1,
-                y: 2,
-                direction: 'E'
-            }
-        })
+        expect(rover.position).toBe('1 2 E')
     })
 })
 
-
 // commands
 // Contains only valid commands
-describe('Navigation Commands', () => {
-    test('Should return error for invalid commands', () => {
-        let actual = () => Rover({
-            ...config,
-            commands: 'ADVDSCV'
+describe('Validate navigation Commands', () => {
+    let rover
+    beforeEach(() => {
+        rover = new Rover({
+            zone: '8 8',
+            start: '1 2 E',
+            commands: ''
         })
+    })
+
+    test('Should return error for invalid commands', () => {
+        let actual = () => rover.process('ADVDSCV')
+
         expect(actual).toThrowError('The only valid commands are M, L, and R')
     })
 
     test('Should accept valid commands', () => {
-        let actual = Rover({
-            ...config,
-            commands: 'MML'
-        })
+        rover.process('MML')
 
-        expect(actual).toMatchObject({
-            commands: 'MML'
-        })
+        expect(rover.commands).toBe('MML')
     })
 })
 
-
-// test navigation computation
-describe('Navigation computation', () => {
+// test single operations
+describe('Can perform basic operations', () => {
     describe('North', () => {
-
+        let rover
         beforeEach(() => {
-            config = {
+            rover = new Rover({
                 zone: '8 8',
                 start: '4 4 N',
                 commands: ''
-            }
+            })
         })
 
         test('Moves up when facing North', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'M'
-            })
+            rover.process('M')
 
-            expect(actual.location).toBe('4 5 N')
+            expect(rover.position).toBe('4 5 N')
         })
 
         test('Faces East when turning to the right', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'R'
-            })
+            rover.process('R')
 
-            expect(actual.location).toBe('4 4 E')
+            expect(rover.position).toBe('4 4 E')
         })
 
         test('Faces West when turning to the left', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'L'
-            })
+            rover.process('L')
 
-            expect(actual.location).toBe('4 4 W')
+            expect(rover.position).toBe('4 4 W')
         })
     })
 
     describe('East', () => {
+        let rover
         beforeEach(() => {
-            config = {
+            rover = new Rover({
                 zone: '8 8',
                 start: '4 4 E',
                 commands: ''
-            }
+            })
         })
 
         test('Moves towards the right when facing East', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'M'
-            })
+            rover.process('M')
 
-            expect(actual.location).toBe('5 4 E')
+            expect(rover.position).toBe('5 4 E')
         })
 
         test('Faces South when turning to the right', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'R'
-            })
+            rover.process('R')
 
-            expect(actual.location).toBe('4 4 S')
+            expect(rover.position).toBe('4 4 S')
         })
 
         test('Faces North when turning to the left', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'L'
-            })
+            rover.process('L')
 
-            expect(actual.location).toBe('4 4 N')
+            expect(rover.position).toBe('4 4 N')
         })
     })
 
     describe('South', () => {
+        let rover
         beforeEach(() => {
-            config = {
+            rover = new Rover({
                 zone: '8 8',
                 start: '4 4 S',
                 commands: ''
-            }
+            })
         })
 
         test('Moves down when facing South', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'M'
-            })
+            rover.process('M')
 
-            expect(actual.location).toBe('4 3 S')
+            expect(rover.position).toBe('4 3 S')
         })
 
         test('Faces West when turning to the right', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'R'
-            })
+            rover.process('R')
 
-            expect(actual.location).toBe('4 4 W')
+            expect(rover.position).toBe('4 4 W')
         })
 
         test('Faces East when turning to the left', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'L'
-            })
+            rover.process('L')
 
-            expect(actual.location).toBe('4 4 E')
+            expect(rover.position).toBe('4 4 E')
         })
     })
 
     describe('West', () => {
+        let rover
         beforeEach(() => {
-            config = {
+            rover = new Rover({
                 zone: '8 8',
                 start: '4 4 W',
                 commands: ''
-            }
+            })
         })
 
         test('Moves left when facing West', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'M'
-            })
+            rover.process('M')
 
-            expect(actual.location).toBe('3 4 W')
+            expect(rover.position).toBe('3 4 W')
         })
 
         test('Faces North when turning to the right', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'R'
-            })
+            rover.process('R')
 
-            expect(actual.location).toBe('4 4 N')
+            expect(rover.position).toBe('4 4 N')
         })
 
         test('Faces South when turning to the left', () => {
-            let actual = Rover({
-                ...config,
-                commands: 'L'
-            })
+            rover.process('L')
 
-            expect(actual.location).toBe('4 4 S')
+            expect(rover.position).toBe('4 4 S')
         })
     })
+})
 
+describe('Can compute the entire route', () => {
 
     test('Should detect a command path that goes out-of-bounds', () => {
-        let actual = () => Rover({
+        let actual = () => new Rover({
             zone: '3 3',
             start: '2 2 S',
             commands: 'MMMMML'
-        })
+        }).process()
 
         expect(actual).toThrowError('The commands go out of bounds')
     })
 
     test('Should correctly compute our test case', () => {
-        let actual = Rover({
+        let actual = new Rover({
             zone: '8 8',
             start: '1 2 E',
             commands: 'MMLMRMMRRMML'
-        })
+        }).process()
 
-        expect(actual.location).toBe('3 3 S')
+        expect(actual.position).toBe('3 3 S')
     })
-})
 
+})
