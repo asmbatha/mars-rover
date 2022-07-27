@@ -19,8 +19,11 @@
     </form>
     <pre class="state-interface" id="file-input"></pre>
     <div class="state-interface" id="controllers">
-        <button onclick="reset()">Reset</button>
-        <button onclick="play()">Simulate</button>
+        <div style="text-align: center;">
+            <button onclick="reset()">Reset</button>
+            <button onclick="play()">Simulate</button>
+        </div>
+        <div style="padding-top: 12px; color: white">Rover locations are logged on the console.</div>
     </div>
     <div class="state-interface" id="zone">
         <div class="state-interface" id="tank">
@@ -63,7 +66,6 @@
         }
 
         function loadFile() {
-            // show upload
             show(document.getElementById('loadFile'))
 
             window.uploadFile = function () {
@@ -136,6 +138,7 @@
 
         function setRoverPosition() {
             const rover = stateMachine.context.rover
+            console.log(rover.position)
             const [left, bottom, direction] = rover.position.split(' ')
             document.documentElement.style.setProperty('--left', left - 1)
             document.documentElement.style.setProperty('--bottom', bottom - 1)
