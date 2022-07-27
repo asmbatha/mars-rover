@@ -43,6 +43,7 @@ export default class Rover {
             isNaN(parseInt(y)) ||
             Number(x) < 1 ||
             Number(y) < 1 ||
+            !direction ||
             !'NEWS'.includes(direction)
         ) throw new Error('Starting position should be in the format `[number] [number] [N|E|W|S]`')
 

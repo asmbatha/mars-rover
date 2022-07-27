@@ -4,6 +4,8 @@
     "description": "Mars rover practical exercise written in Javascript",
     "main": "index.js",
     "scripts": {
+        "start": "node index.js",
+        "ui": "node server.js",
         "test": "jest"
     },
     "repository": {
@@ -30,5 +32,9 @@
         "transform": {
             "^.+\\.jsx?$": "babel-jest"
         }
+    },
+    "dependencies": {
+        "express": "^4.18.1",
+        "open": "^8.4.0"
     }
 }

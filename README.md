@@ -1,4 +1,5 @@
 # Mars Rover Challenge
+![Visualiser](/Screenshot.png)
 
 [MarsRover.pdf](MarsRover.pdf) contains a brief about the problem.
 
@@ -41,6 +42,8 @@ This is how the rover will interpret each line
 
 ## System Components
 
+![State diagram](/state-diagram.png)
+
 * Rover navigation engine
     - Javascript Class that perfoms the navigation computation
     - Will be unit tested to catch errors and guarantee expected behaviour
@@ -50,6 +53,7 @@ This is how the rover will interpret each line
 * Node executable script
     - Reads the contents of the commands file and send it to the Rover engine for execution.
 * Bonus maybe: 🤷🏽‍♂️
+    - State Machine
     - Browser interface
         - File upload
         - Navigation visualization
@@ -60,9 +64,9 @@ This is how the rover will interpret each line
 - [x] Write tests
 - [x] Rover navigation engine
 - [X] Node executable script
-- [ ] Interface with file upload
-- [ ] Navigation visualization
-- [ ] Review and update README
+- [X] Interface with file upload
+- [X] Navigation visualization
+- [X] Review and update README
 
 ## Usage
 
@@ -75,8 +79,15 @@ npm i
 ```
 node .
 ```
+or
+```
+npm start
+```
 
 ### Run from browser
+```
+npm run ui
+```
 
 ### Testing
 ```
