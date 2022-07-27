@@ -72,14 +72,10 @@ This is how the rover will interpret each line
 
 ### Installation
 ```
-npm i
+npm install
 ```
 
 ### Run from command line
-```
-node .
-```
-or
 ```
 npm start
 ```
