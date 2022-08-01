@@ -2,11 +2,15 @@
     "name": "mars-rover",
     "version": "1.0.0",
     "description": "Mars rover practical exercise written in Javascript",
-    "main": "index.js",
+    "main": "./bin/index.js",
+    "bin": {
+        "rover": "./bin/index.js"
+    },
     "scripts": {
-        "start": "node index.js",
-        "ui": "node server.js",
-        "test": "jest"
+        "start": "node ./bin/index.js ./resources/instructions.txt",
+        "visualizer": "node ./server.js",
+        "test": "jest",
+        "tdd": "npm test -- --watchAll"
     },
     "repository": {
         "type": "git",

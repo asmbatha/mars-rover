@@ -7,7 +7,7 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./visualizer/style.css">
 </head>
 
 <body>
@@ -34,24 +34,44 @@
         </div>
     </div>
     <script type="module">
-        import { stateMachine } from './uiStatesMachine.js'
-        import Rover from './rover.js'
+        import { StateMachine } from '/visualizer/StatesMachine.js'
+        import { StateMachine as Navigator } from '/bin/StateMachine.js'
+        import handlers from '/bin/state-handlers/index.js'
+        import Rover from '/bin/rover.js'
 
-        window.stateMachine = stateMachine
-
-        function handleState({ name, actions }) {
-            setTimeout(() => {
-                ({
-                    'load-file': loadFile,
-                    'set-zone': setZone,
-                    'set-start': setStart,
-                    'simulate': simulate,
-                    'show-error': showError
-                }[name])(actions)
-            }, 10)
+        const visualizerHandlers = {
+            'load-file': loadFile,
+            'initialize': initializeNavigator
         }
+        const visualizer = new StateMachine({
+            onEntry: state => {
 
-        window.onload = handleState(stateMachine.state)
+                try {
+                    if (state.name in visualizerHandlers) visualizerHandlers[state.name](visualizer)
+                } catch (error) {
+                    console.error('Error while calling state handler', { error, state })
+                }
+            },
+            state: 'load-file'
+        })
+
+        window.visualizer = visualizer
+
+        const navigator = new Navigator({
+            onEntry: state => {
+                try {
+                    if (state.name == "navigate") simulate(navigator)
+                    if (state.name in handlers) handlers[state.name](navigator)
+                } catch (error) {
+                    console.error('Error while calling state handler', { error, state })
+                }
+            },
+            state: 'extract-instructions',
+            debug: true
+        })
+
+
+        window.onload = visualizer.start()
 
         function show(el) {
             el.style.display = 'block'
@@ -65,7 +85,7 @@
             document.querySelectorAll('.state-interface').forEach(el => el.style.display = 'none')
         }
 
-        function loadFile() {
+        function loadFile(machine) {
             show(document.getElementById('loadFile'))
 
             window.uploadFile = function () {
@@ -79,14 +99,14 @@
 
                     if (file.type.match(/text.*/)) {
                         reader.onload = function (event) {
-                            stateMachine.context.file = event.target.result
+                            navigator.context.file = event.target.result
 
                             hideAll()
                             hide(form)
                             show(filePreview)
-                            filePreview.innerHTML = stateMachine.context.file
+                            filePreview.innerHTML = navigator.context.file
 
-                            handleState(stateMachine.next)
+                            machine.action('next')
                         }
                     } else {
                         alert("Please select a text file!");
@@ -99,27 +119,17 @@
             }
         }
 
+        function initializeNavigator() {
+            navigator.start()
+        }
 
         function setZone() {
-            const rover = stateMachine.context.rover = new Rover({
-                zone: '1 1',
-                start: '1 1 E',
-                commands: ''
-            })
-            try {
-                rover.zone = stateMachine.context.file.split('\n')[0]
 
-                const [cols, rows] = rover.zone.split(' ')
-                document.documentElement.style.setProperty('--cols', cols)
-                document.documentElement.style.setProperty('--rows', rows)
+            const { x, y } = navigator.context.zone
 
-                show(document.getElementById('zone'))
-
-                handleState(stateMachine.next)
-            } catch (error) {
-                stateMachine.context.error = error
-                handleState(stateMachine.error)
-            }
+            document.documentElement.style.setProperty('--cols', x)
+            document.documentElement.style.setProperty('--rows', y)
+            show(document.getElementById('zone'))
         }
 
         function setStart() {
@@ -152,6 +162,7 @@
         }
 
         function simulate() {
+            setZone()
             show(document.getElementById('controllers'))
 
             const rover = stateMachine.context.rover
