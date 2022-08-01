@@ -4,7 +4,7 @@
     "description": "Mars rover practical exercise written in Javascript",
     "main": "./bin/index.js",
     "bin": {
-        "rover": "./bin/index.js"
+        "mars-rover": "./bin/index.js"
     },
     "scripts": {
         "start": "node ./bin/index.js ./resources/instructions.txt",

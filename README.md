@@ -29,63 +29,58 @@ This is how the rover will interpret each line
    `1 2 E` = `x y direction`
 3. List of commands (movements and rotations)
 
-## Tasks
-
-> Create a navigation system
-
-* Design a program which takes a text file in the format as described above and then displays its resulting rover location to the console.
-* Include a README with:
-  - Clear instructions on how to use your program.
-  - A brief description of the design decisions made in your program
-  - How you have ensured your code’s correctness.
-* Also include The input to your program (as described above) as well as any additional inputs.
-
 ## System Components
 
 ![State diagram](/state-diagram.png)
 
-* Rover navigation engine
-    - Javascript Class that perfoms the navigation computation
-    - Will be unit tested to catch errors and guarantee expected behaviour
-    - We will developed using the TDD methodology
-* Command file
-    - A text that contains a list of commands as described above
-* Node executable script
-    - Reads the contents of the commands file and send it to the Rover engine for execution.
-* Bonus maybe: 🤷🏽‍♂️
-    - State Machine
-    - Browser interface
-        - File upload
-        - Navigation visualization
-
-## Roadmap
-
-- [x] Testing environment
-- [x] Write tests
-- [x] Rover navigation engine
-- [X] Node executable script
-- [X] Interface with file upload
-- [X] Navigation visualization
-- [X] Review and update README
+* State Machine
+* Rover navigation simulator
+* Nodejs CLI
+* Browser Visualiser
 
 ## Usage
 
 ### Installation
+To install in local directory
 ```
-npm install
+$ npm install
 ```
 
+To install as a CLI application
+```
+$ npm install -g
+```
+
+You can then execute it in your terminal by passing an instructions file as an argument
+e.g.
+```sh
+$ mars-rover ./resources/instructions.txt
+```
+You can also pipe in a file as stdin
+```sh
+$ curl -s "https://yourdonamin.api/input.txt" | mars-rover
+```
+
+
 ### Run from command line
+Run with demo instructions file
+```sh
+$ npm start
 ```
-npm start
+Run with your own instructions file
+```sh
+$ node . [FILE_NAME]
 ```
+
+![cli-sequence-diagram](/cli-sequence-diagram.png)
 
 ### Run from browser
 ```
-npm run ui
+$ npm run visualiser
 ```
 
+![browser-sequence-diagram](/browser-sequence-diagram.png)
 ### Testing
 ```
-npm test
+$ npm test
 ```

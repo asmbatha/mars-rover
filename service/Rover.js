@@ -100,7 +100,7 @@ export default class Rover {
     }
 
     stop() {
-        if (this.navigator) clearTimeout(this.navigator)
+        if (this.busy) this.busy = false
     }
 
     #execute(command) {
@@ -139,9 +139,9 @@ export default class Rover {
         this.#direction = {
             N: 'W',
             E: 'N',
-            S: 'E',
-            W: 'S',
-        }[this.#direction]
-    }
+                S: 'E',
+                W: 'S',
+            }[this.#direction]
+        }
 
 }
