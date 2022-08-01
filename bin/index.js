@@ -2,23 +2,22 @@
 "use strict";
 
 import fs from 'fs'
-import handlers from "./state-handlers/index.js"
-import { StateMachine } from './StateMachine.js';
-
-const machine = new StateMachine({
-    onEntry: state => {
-        try {
-            if (state.name in handlers) handlers[state.name](machine)
-        } catch (error) {
-            console.error('Error while calling state handler', { error, state })
-        }
-    },
-    state: 'extract-instructions',
-    // debug: true
-})
+import handlers from "../service/state-handlers/index.js"
+import { StateMachine } from '../service/StateMachine.js';
 
 try {
-    // load file
+    const machine = new StateMachine({
+        onEntry: state => {
+            try {
+                if (state.name in handlers) handlers[state.name](machine)
+            } catch (error) {
+                console.error('Error while calling state handler', { error, state })
+            }
+        },
+        state: 'extract-instructions',
+        // debug: true
+    })
+
     function readData(source) {
         return fs.readFileSync(source, 'utf8').toString()
     }

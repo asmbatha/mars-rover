@@ -11,9 +11,9 @@
 </head>
 
 <body>
-    <form class="state-interface" id="loadFile">
+    <form id="loadFile">
         <label>
-            Click to select a text file
+            Upload new instructions
             <input type="file" name="file" oninput="uploadFile()">
         </label>
     </form>
@@ -23,8 +23,8 @@
             <button onclick="reset()">Reset</button>
             <button onclick="play()">Simulate</button>
         </div>
-        <div style="padding-top: 12px; color: white">Rover locations are logged on the console.</div>
     </div>
+    <div class="state-interface" id="location">Location: ??????</div>
     <div class="state-interface" id="zone">
         <div class="state-interface" id="tank">
             <div class="wrapper">
@@ -34,44 +34,9 @@
         </div>
     </div>
     <script type="module">
-        import { StateMachine } from '/visualizer/StatesMachine.js'
-        import { StateMachine as Navigator } from '/bin/StateMachine.js'
-        import handlers from '/bin/state-handlers/index.js'
-        import Rover from '/bin/rover.js'
-
-        const visualizerHandlers = {
-            'load-file': loadFile,
-            'initialize': initializeNavigator
-        }
-        const visualizer = new StateMachine({
-            onEntry: state => {
-
-                try {
-                    if (state.name in visualizerHandlers) visualizerHandlers[state.name](visualizer)
-                } catch (error) {
-                    console.error('Error while calling state handler', { error, state })
-                }
-            },
-            state: 'load-file'
-        })
-
-        window.visualizer = visualizer
-
-        const navigator = new Navigator({
-            onEntry: state => {
-                try {
-                    if (state.name == "navigate") simulate(navigator)
-                    if (state.name in handlers) handlers[state.name](navigator)
-                } catch (error) {
-                    console.error('Error while calling state handler', { error, state })
-                }
-            },
-            state: 'extract-instructions',
-            debug: true
-        })
-
-
-        window.onload = visualizer.start()
+        import { StateMachine } from '/service/StateMachine.js'
+        import stateHandlers from '/service/state-handlers/index.js'
+        import Rover from '/service/Rover.js'
 
         function show(el) {
             el.style.display = 'block'
@@ -81,32 +46,31 @@
             el.style.display = 'none'
         }
 
-        function hideAll() {
-            document.querySelectorAll('.state-interface').forEach(el => el.style.display = 'none')
-        }
+        window.onload = function () {
+            function readInstructions(file) {
+                const filePreview = document.getElementById('file-input')
+                show(filePreview)
+                filePreview.innerHTML = file
+                setTimeout(() => initializeNavigator(file), 10)
+            }
 
-        function loadFile(machine) {
-            show(document.getElementById('loadFile'))
+            const instructions = window.localStorage.getItem('instructions')
+            if (instructions) {
+                readInstructions(instructions)
+            }
 
             window.uploadFile = function () {
                 if (window.File && window.FileReader && window.FileList && window.Blob) {
                     const form = document.querySelector('form')
                     const file = form.file.files[0];
-                    const filePreview = document.getElementById('file-input')
                     form.reset()
                     const reader = new FileReader()
 
 
                     if (file.type.match(/text.*/)) {
                         reader.onload = function (event) {
-                            navigator.context.file = event.target.result
-
-                            hideAll()
-                            hide(form)
-                            show(filePreview)
-                            filePreview.innerHTML = navigator.context.file
-
-                            machine.action('next')
+                            window.localStorage.setItem('instructions', event.target.result)
+                            readInstructions(event.target.result)
                         }
                     } else {
                         alert("Please select a text file!");
@@ -119,39 +83,28 @@
             }
         }
 
-        function initializeNavigator() {
+        function initializeNavigator(file) {
+            const handlers = {
+                ...stateHandlers,
+                navigate
+            }
+
+            const navigator = new StateMachine({
+                onEntry: state => {
+                    if (state.name in handlers) handlers[state.name](navigator)
+                },
+                state: 'extract-instructions'
+            })
+
+            navigator.context.file = file
+
             navigator.start()
         }
 
-        function setZone() {
-
-            const { x, y } = navigator.context.zone
-
-            document.documentElement.style.setProperty('--cols', x)
-            document.documentElement.style.setProperty('--rows', y)
-            show(document.getElementById('zone'))
-        }
-
-        function setStart() {
-            const rover = stateMachine.context.rover
-            try {
-                rover.position = stateMachine.context.file.split('\n')[1]
-                setRoverPosition()
-                show(document.getElementById('tank'))
-                stateMachine.context.playing = false
-                handleState(stateMachine.next)
-            } catch (error) {
-                stateMachine.context.error = error
-                handleState(stateMachine.error)
-            }
-        }
-
-        function setRoverPosition() {
-            const rover = stateMachine.context.rover
-            console.log(rover.position)
-            const [left, bottom, direction] = rover.position.split(' ')
-            document.documentElement.style.setProperty('--left', left - 1)
-            document.documentElement.style.setProperty('--bottom', bottom - 1)
+        function setRoverPosition(position) {
+            const { x, y, direction } = position
+            document.documentElement.style.setProperty('--left', x - 1)
+            document.documentElement.style.setProperty('--bottom', y - 1)
 
             document.getElementById("tank").style.transform = {
                 N: "rotate(0deg)",
@@ -159,46 +112,40 @@
                 S: "rotate(180deg)",
                 W: "rotate(270deg)"
             }[direction]
+
+            const location = `${x} ${y} ${direction}`
+            console.log(location)
+            document.getElementById('location').innerHTML = 'Location: ' + location
         }
 
-        function simulate() {
-            setZone()
+        function navigate(navigator) {
+            show(document.getElementById('zone'))
             show(document.getElementById('controllers'))
+            show(document.getElementById('tank'))
+            show(document.getElementById('location'))
 
-            const rover = stateMachine.context.rover
+            const { x, y } = navigator.context.zone
+            document.documentElement.style.setProperty('--cols', x)
+            document.documentElement.style.setProperty('--rows', y)
 
-            let commands = Array.from(stateMachine.context.file.split('\n')[2])
+            const rover = navigator.context.rover
 
-            window.play = function () {
-                stateMachine.context.playing = true
-                setTimeout(() => {
-                    try {
-                        if (stateMachine.context.playing) {
-                            rover.process(commands.shift())
-                            setRoverPosition()
-                            if (commands.length && stateMachine.context.playing) play()
-                        }
-                    } catch (error) {
-                        setRoverPosition()
-                        setTimeout(() => {
-                            alert(error.message)
-                            window.reset()
-                        }, 500)
-                    }
+            setRoverPosition(rover.position)
 
-                }, 600)
+            rover.onUpdated = setRoverPosition
+
+            rover.onError = (error) => {
+                setTimeout(() => alert(error), 600)
+            }
+
+            window.play = async function () {
+                let commands = navigator.context.instructions.commands
+                await rover.navigate(commands, 600)
             }
 
             window.reset = function () {
-                stateMachine.state = 'set-start'
-                handleState(stateMachine.state)
+                navigator.action('reset')
             }
-        }
-
-        function showError() {
-            alert(stateMachine.context.error.message)
-            hideAll()
-            handleState(stateMachine.next)
         }
     </script>
 </body>

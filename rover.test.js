@@ -224,7 +224,7 @@ describe('Can compute the entire route', () => {
             commands: 'MMMMML'
         }).process()
 
-        expect(actual).toThrowError('The commands go out of bounds')
+        expect(actual).toThrowError('Out of bounds')
     })
 
     test('Should correctly compute our test case', () => {

@@ -39,10 +39,8 @@ export class StateMachine {
         },
         'navigate': {
             error: 'show-error',
+            reset: 'set-start',
             next: 'done'
-        },
-        'done': {
-            reset: 'set-start'
         },
         'show-error': {},
     }
@@ -72,7 +70,8 @@ export class StateMachine {
         } catch (error) {
             console.error('Error while executing state actions', {
                 state: this.state,
-                action
+                action,
+                error
             })
         }
     }

@@ -10,6 +10,7 @@ export default async (stateMachine) => {
         await rover.navigate(commands, 0)
 
         stateMachine.action('next')
+
     } catch (error) {
         stateMachine.context.error = error
         stateMachine.action('error')
