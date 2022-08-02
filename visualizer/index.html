@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./visualizer/style.css">
+</head>
+
+<body>
+    <form id="loadFile">
+        <label>
+            Upload new instructions
+            <input type="file" name="file" oninput="uploadFile()">
+        </label>
+    </form>
+    <pre class="state-interface" id="file-input"></pre>
+    <div class="state-interface" id="controllers">
+        <div style="text-align: center;">
+            <button onclick="reset()">Reset</button>
+            <button onclick="play()">Simulate</button>
+        </div>
+    </div>
+    <div class="state-interface" id="location">Location: ??????</div>
+    <div class="state-interface" id="zone">
+        <div class="state-interface" id="tank">
+            <div class="wrapper">
+                <div class="body"></div>
+                <div class="tracks"></div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { StateMachine } from '/service/StateMachine.js'
+        import stateHandlers from '/service/state-handlers/index.js'
+        import Rover from '/service/Rover.js'
+
+        function show(el) {
+            el.style.display = 'block'
+        }
+
+        function hide(el) {
+            el.style.display = 'none'
+        }
+
+        window.onload = function () {
+            function readInstructions(file) {
+                const filePreview = document.getElementById('file-input')
+                show(filePreview)
+                filePreview.innerHTML = file
+                setTimeout(() => initializeNavigator(file), 10)
+            }
+
+            const instructions = window.localStorage.getItem('instructions')
+            if (instructions) {
+                readInstructions(instructions)
+            }
+
+            window.uploadFile = function () {
+                if (window.File && window.FileReader && window.FileList && window.Blob) {
+                    const form = document.querySelector('form')
+                    const file = form.file.files[0];
+                    form.reset()
+                    const reader = new FileReader()
+
+
+                    if (file.type.match(/text.*/)) {
+                        reader.onload = function (event) {
+                            window.localStorage.setItem('instructions', event.target.result)
+                            readInstructions(event.target.result)
+                        }
+                    } else {
+                        alert("Please select a text file!");
+                    }
+
+                    reader.readAsText(file);
+                } else {
+                    alert("Your browser is too old to support HTML5 File API");
+                }
+            }
+        }
+
+        function initializeNavigator(file) {
+            const handlers = {
+                ...stateHandlers,
+                navigate
+            }
+
+            const navigator = new StateMachine({
+                onEntry: state => {
+                    if (state.name in handlers) handlers[state.name](navigator)
+                },
+                state: 'extract-instructions'
+            })
+
+            navigator.context.file = file
+
+            navigator.start()
+        }
+
+        function setRoverPosition(position) {
+            const { x, y, direction } = position
+            document.documentElement.style.setProperty('--left', x - 1)
+            document.documentElement.style.setProperty('--bottom', y - 1)
+
+            document.getElementById("tank").style.transform = {
+                N: "rotate(0deg)",
+                E: "rotate(90deg)",
+                S: "rotate(180deg)",
+                W: "rotate(270deg)"
+            }[direction]
+
+            const location = `${x} ${y} ${direction}`
+            console.log(location)
+            document.getElementById('location').innerHTML = 'Location: ' + location
+        }
+
+        function navigate(navigator) {
+            show(document.getElementById('zone'))
+            show(document.getElementById('controllers'))
+            show(document.getElementById('tank'))
+            show(document.getElementById('location'))
+
+            const { x, y } = navigator.context.zone
+            document.documentElement.style.setProperty('--cols', x)
+            document.documentElement.style.setProperty('--rows', y)
+
+            const rover = navigator.context.rover
+
+            setRoverPosition(rover.position)
+
+            rover.onUpdated = setRoverPosition
+
+            rover.onError = (error) => {
+                setTimeout(() => alert(error), 600)
+            }
+
+            window.play = async function () {
+                let commands = navigator.context.instructions.commands
+                await rover.navigate(commands, 600)
+            }
+
+            window.reset = function () {
+                navigator.action('reset')
+            }
+        }
+    </script>
+</body>
+
+</html>

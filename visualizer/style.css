@@ -1,7 +1,7 @@
 html,
 body {
     background: #222;
-    font-family: monospace;
+    font-family: Arial, Helvetica, sans-serif;
     padding: 0;
     margin: 0;
     min-height: 90vh;
@@ -21,6 +21,7 @@ body {
 :root {
     --rows: 5;
     --cols: 6;
+    --block-width: min(calc(90vw / (var(--cols) + 1)), calc((100vh - 270px) / (var(--rows) + 1)));
 }
 
 .state-interface {
@@ -28,21 +29,19 @@ body {
 }
 
 form {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 1em;
+    justify-content: center;
 }
 
 #loadFile label {
     max-width: 600px;
-    padding: 24px 32px;
     margin: auto;
-    display: block;
+    padding: 8px 16px;
+    display: inline-block;
     cursor: pointer;
     background: #027ef2;
-    border-radius: 1em;
-    font-size: 1.5em;
-    font-weight: bold;
+    font-weight: 500;
     color: white;
 }
 
@@ -57,32 +56,43 @@ form {
 pre {
     display: none;
     background: white;
-    padding: 1rem;
-    width: calc(min(80vh, 90vw, 600px) / (var(--cols) + 1) * var(--cols));
+    padding: 36px 1rem 1rem;
     white-space: pre-wrap;
+    position: relative;
+    min-width: 300px;
+    min-height: 100px;
+}
+
+pre::before {
+    content: 'Instructions';
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2px 0;
+    width: 100%;
+    border-bottom: 1px solid #999;
+    text-align: center;
 }
 
 #zone {
-    --block-width: min(80vh, 90vw, 600px) / (var(--cols) + 1);
     box-shadow: 0px 1px 3px #999;
     border-radius: 3px;
     height: calc(var(--block-width) * var(--rows));
     width: calc(var(--block-width) * var(--cols));
-    margin: 24px auto;
     position: relative;
     background-color: white;
-    background-size: min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1)) min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1));
+    background-size: var(--block-width) var(--block-width);
     background-image:
         linear-gradient(to right, #EEEEEE 1px, transparent 1px),
         linear-gradient(to bottom, #EEEEEE 1px, transparent 1px);
 }
 
 #tank {
-    width: min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1));
-    height: min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1));
+    width: var(--block-width);
+    height: var(--block-width);
     position: absolute;
-    bottom: calc(var(--bottom) * min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1)));
-    left: calc(var(--left) * min(80vh / (var(--cols) + 1), 90vw / (var(--cols) + 1), 600px / (var(--cols) + 1)));
+    bottom: calc(var(--bottom) * var(--block-width));
+    left: calc(var(--left) * var(--block-width));
     transition: all .5s linear;
 }
 
@@ -145,4 +155,9 @@ pre {
     margin: 12px 8px 0;
     padding: 6px 16px;
     cursor: pointer;
+}
+
+#location {
+    padding-top: 24px;
+    color: white;
 }
