@@ -84,3 +84,7 @@ $ npm run visualiser
 ```
 $ npm test
 ```
+Or
+```
+$ npm run tdd
+```
